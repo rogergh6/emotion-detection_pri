@@ -2,7 +2,18 @@ import requests
 import json
 
 def emotion_detector(text_to_analyze):
-    # Endpoint de Watson NLP (ajusta con tu URL real)
+    if not text_to_analyze or text_to_analyze.strip() == "":
+        # ✅ Manejo de entrada en blanco
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "status_code": 400
+        }
+
+    # Ajusta con tu URL real de Watson NLP
     url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/TU_INSTANCIA/v1/analyze"
     headers = {"Content-Type": "application/json"}
     payload = json.dumps({
@@ -17,13 +28,23 @@ def emotion_detector(text_to_analyze):
 
     if response.status_code == 200:
         emotions = response.json()["emotion"]["document"]["emotion"]
-        # ✅ Devuelve las emociones principales en formato diccionario
         return {
             "anger": emotions["anger"],
             "disgust": emotions["disgust"],
             "fear": emotions["fear"],
             "joy": emotions["joy"],
-            "sadness": emotions["sadness"]
+            "sadness": emotions["sadness"],
+            "status_code": 200
+        }
+    elif response.status_code == 400:
+        # ✅ Caso explícito de error 400
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "status_code": 400
         }
     else:
-        return {"error": f"Error en la solicitud: {response.status_code}"}
+        return {"error": f"Error en la solicitud: {response.status_code}", "status_code": response.status_code}

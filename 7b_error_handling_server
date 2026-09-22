@@ -1,0 +1,12 @@
+@app.route('/analizar_emocion', methods=['POST'])
+def analizar_emocion():
+    datos = request.get_json()
+    texto = datos.get("texto", "").strip()
+
+    if not texto:
+        return jsonify({
+            "error": "Solicitud incorrecta: el texto no puede estar vacío."
+        }), 400
+
+    resultado = emotion_detector(texto)
+    return jsonify(resultado), resultado.get("status_code", 200)
